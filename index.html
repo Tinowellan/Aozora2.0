@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Appel Horreur</title>
+  <style>
+    body.call-active {
+      overflow: hidden;
+      margin: 0;
+    }
+
+    #fake-call {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: #000;
+      color: white;
+      z-index: 9999;
+      font-family: sans-serif;
+    }
+
+    #incoming-call {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+
+    #caller-info {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    #caller-info h2 {
+      font-size: 2em;
+      margin: 10px 0;
+    }
+
+    #caller-info p {
+      font-size: 1em;
+      color: #aaa;
+    }
+
+    #slide-container {
+      background: #222;
+      border-radius: 50px;
+      padding: 10px;
+      width: 300px;
+      margin: auto;
+      position: relative;
+      user-select: none;
+      overflow: hidden;
+    }
+
+    #slider {
+      background: #4CAF50;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      position: absolute;
+      left: 5px;
+      top: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #slider i {
+      font-size: 22px;
+      color: white;
+    }
+
+    #call-screen {
+      display: none;
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    #hangup {
+      margin-top: 20px;
+      background: red;
+      border: none;
+      padding: 15px 30px;
+      color: white;
+      font-size: 18px;
+      border-radius: 40px;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    video {
+      max-width: 100%;
+    }
+  </style>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- 📽️ Vidéo -->
+  <video id="scary-video" autoplay controls style="width:100%; max-height: 100vh;">
+    <source src="media/The Ring - Cursed Video Tape (ORIGINAL - STRAIGHT FROM MOVIE).mp4" type="video/mp4">
+    Votre navigateur ne supporte pas la lecture de vidéos.
+  </video>
+
+  <!-- 📞 Interface d'appel -->
+  <div id="fake-call">
+    <div id="incoming-call">
+      <div id="caller-info">
+        <h2>Inconnu</h2>
+        <p>Appel entrant…</p>
+      </div>
+      <div id="slide-container">
+        <div id="slider"><i class="fa fa-phone"></i></div>
+      </div>
+      <div id="call-screen">
+        <p>Appel en cours...</p>
+        <button id="hangup" disabled>Raccrocher</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🎵 Sons -->
+  <audio id="voice-audio" src="media/countdown-139316.mp3"></audio>
+  <audio id="bg-audio" src="https://cdn.pixabay.com/download/audio/2022/02/23/audio_6b5604171c.mp3?filename=countdown-139316.mp3" loop></audio>
+
+  <!-- 📜 Script -->
+  <script>
+    const slider = document.getElementById("slider");
+    const container = document.getElementById("slide-container");
+    const callScreen = document.getElementById("call-screen");
+    const fakeCall = document.getElementById("fake-call");
+    const video = document.getElementById("scary-video");
+    const voiceAudio = document.getElementById("voice-audio");
+    const bgAudio = document.getElementById("bg-audio");
+    bgAudio.volume = 0.3;
+
+    let isDragging = false;
+    let startX;
+
+    slider.addEventListener("mousedown", function (e) {
+      isDragging = true;
+      startX = e.clientX;
+    });
+
+    document.addEventListener("mouseup", function () {
+      isDragging = false;
+      slider.style.left = "5px";
+    });
+
+    document.addEventListener("mousemove", function (e) {
+      if (!isDragging) return;
+      let x = e.clientX - startX;
+      if (x < 0) x = 0;
+      let rect = container.getBoundingClientRect();
+      if (x > rect.width - 55) x = rect.width - 55;
+      slider.style.left = x + "px";
+
+      if (x > rect.width - 60) {
+        container.style.display = "none";
+        callScreen.style.display = "block";
+        playScaryAudio();
+      }
+    });
+
+    function playScaryAudio() {
+      voiceAudio.play();
+      bgAudio.play();
+    }
+
+    video.addEventListener("ended", function () {
+      fakeCall.style.display = "block";
+      document.body.classList.add("call-active");
+      video.style.display = "none";
+    });
+
+    voiceAudio.volume = 1.0;
+    bgAudio.volume = 0.3;
+  </script>
+
+</body>
+</html>
